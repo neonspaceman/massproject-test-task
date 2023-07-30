@@ -7,6 +7,7 @@ parameters:
     exceptions:
         Symfony\Component\HttpKernel\Exception\NotFoundHttpException: { code: 404 }
         App\Exception\RequestNotFoundException: { code: 404, hidden: false }
+        App\Exception\TooManyRequests: { code: 429, hidden: false }
 
 services:
     # default configuration for services in *this* file

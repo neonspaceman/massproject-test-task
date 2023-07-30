@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 
+use App\Attribute\RateLimitingAnonymousApi;
 use App\Attribute\RequestBody;
 use App\Model\CreateRequest;
 use App\Model\UpdateRequest;
@@ -27,11 +28,7 @@ class RequestsController extends AbstractController
 
     #[Route(path: '/api/v1/requests', methods: 'GET')]
     #[OA\Tag(name: 'Requests')]
-    #[OA\Response(
-        response: 200,
-        description: "Get requests list",
-        content: new Model(type: RequestListResponse::class)
-    )]
+    #[OA\Response(response: 200, description: "Get requests list", content: new Model(type: RequestListResponse::class))]
     public function list(): Response
     {
         return $this->json($this->requestService->getRequestList());
@@ -42,8 +39,8 @@ class RequestsController extends AbstractController
     #[OA\RequestBody(content: new Model(type: UpdateRequest::class))]
     #[OA\Parameter(name: 'id', description: 'Request Id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Update request', content: new Model(type: UpdateRequestResponse::class))]
-    #[OA\Response(response: 404, description: 'Request not found', content: new Model(type: ErrorResponse::class))]
     #[OA\Response(response: 400, description: 'Bad request', content: new Model(type: ErrorResponse::class))]
+    #[OA\Response(response: 404, description: 'Request not found', content: new Model(type: ErrorResponse::class))]
     public function update(int $id, #[RequestBody] UpdateRequest $updateRequest): Response
     {
         return $this->json($this->requestService->updateRequest($id, $updateRequest));
@@ -54,6 +51,7 @@ class RequestsController extends AbstractController
     #[OA\RequestBody(content: new Model(type: CreateRequest::class))]
     #[OA\Response(response: 200, description: 'Create request', content: new Model(type: CreateRequestResponse::class))]
     #[OA\Response(response: 400, description: 'Bad request', content: new Model(type: ErrorResponse::class))]
+    #[OA\Response(response: 429, description: 'Too many request', content: new Model(type: ErrorResponse::class))]
     public function create(#[RequestBody] CreateRequest $request): Response
     {
         return $this->json($this->requestService->createRequest($request));

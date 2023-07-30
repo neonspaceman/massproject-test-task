@@ -17,6 +17,7 @@ use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class RequestsController extends AbstractController
 {
@@ -35,7 +36,10 @@ class RequestsController extends AbstractController
     }
 
     #[Route(path: '/api/v1/requests/{id}', methods: 'PUT')]
+    #[IsGranted('ROLE_USER')]
     #[OA\Tag(name: 'Requests')]
+    #[OA\HeaderParameter(name: 'X-AUTH-USER', description: 'User\'s email', required: true)]
+    #[OA\HeaderParameter(name: 'X-AUTH-PASSWORD', description: 'User\'s password', required: true)]
     #[OA\RequestBody(content: new Model(type: UpdateRequest::class))]
     #[OA\Parameter(name: 'id', description: 'Request Id', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))]
     #[OA\Response(response: 200, description: 'Update request', content: new Model(type: UpdateRequestResponse::class))]

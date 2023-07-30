@@ -3,17 +3,21 @@
 namespace App\Service;
 
 use App\Entity\Request;
+use App\Enum\RequestStatus;
 use App\Model\CreateRequest;
+use App\Model\UpdateRequest;
+use App\Model\CreateRequestResponse;
 use App\Model\RequestListItem;
 use App\Model\RequestListResponse;
+use App\Model\UpdateRequestResponse;
 use App\Repository\RequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class RequestService
 {
     public function __construct(
-        private readonly EntityManagerInterface $em,
-        private readonly RequestRepository $requestRepository
+        private EntityManagerInterface $em,
+        private RequestRepository $requestRepository
     )
     {
     }
@@ -36,8 +40,30 @@ class RequestService
             ->setItems($items);
     }
 
-    public function createRequest(CreateRequest $request): void
+    public function updateRequest(int $id, UpdateRequest $updateRequest): UpdateRequestResponse
     {
+        $request = $this->requestRepository->findById($id);
+        $request
+            ->setStatus(RequestStatus::Resolved)
+            ->setComment($updateRequest->getComment());
+        $this->em->persist($request);
+        $this->em->flush();
 
+        return (new UpdateRequestResponse())
+            ->setId($request->getId());
+    }
+
+    public function createRequest(CreateRequest $createRequest): CreateRequestResponse
+    {
+        $request = (new Request())
+            ->setStatus(RequestStatus::Active)
+            ->setEmail($createRequest->getEmail())
+            ->setName($createRequest->getName())
+            ->setMessage($createRequest->getMessage());
+        $this->em->persist($request);
+        $this->em->flush();
+
+        return (new CreateRequestResponse())
+            ->setId($request->getId());
     }
 }

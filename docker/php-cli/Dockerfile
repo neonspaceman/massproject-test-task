@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
 	git
 
 RUN docker-php-ext-install pdo pdo_mysql mysqli zip
+RUN pecl install redis && docker-php-ext-enable redis
 
 RUN wget https://getcomposer.org/installer -O - -q | php -- --install-dir=/bin --filename=composer --quiet
 

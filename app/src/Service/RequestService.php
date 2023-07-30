@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Request;
 use App\Enum\RequestStatus;
+use App\Message\SendEmailMessage;
 use App\Model\CreateRequest;
 use App\Model\UpdateRequest;
 use App\Model\CreateRequestResponse;
@@ -11,13 +12,16 @@ use App\Model\RequestListItem;
 use App\Model\RequestListResponse;
 use App\Model\UpdateRequestResponse;
 use App\Repository\RequestRepository;
+use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class RequestService
 {
     public function __construct(
         private EntityManagerInterface $em,
-        private RequestRepository $requestRepository
+        private RequestRepository $requestRepository,
+        private MessageBusInterface $bus
     )
     {
     }
@@ -48,6 +52,12 @@ class RequestService
             ->setComment($updateRequest->getComment());
         $this->em->persist($request);
         $this->em->flush();
+
+        $sendEmailMessage = new SendEmailMessage(
+            $request->getEmail(),
+            'Your request has been answered',
+            'Content');
+        $this->bus->dispatch($sendEmailMessage);
 
         return (new UpdateRequestResponse())
             ->setId($request->getId());

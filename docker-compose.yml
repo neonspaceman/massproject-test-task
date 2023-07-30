@@ -20,6 +20,7 @@ services:
     container_name: ${PROJECT_NAME}-php-fpm
     depends_on:
       - mysql
+      - redis
 
   php-cli:
     build:
@@ -30,6 +31,22 @@ services:
     container_name: ${PROJECT_NAME}-php-cli
     ports:
       - "2222:22"
+      
+  send-email-handler:
+    build:
+      context: ./docker/send-email-handler
+    volumes:
+      - ./app:/symfony
+    restart: always
+    container_name: ${PROJECT_NAME}-send-email-handler
+    depends_on:
+      - mysql
+      - redis
+      
+  redis:
+    image: redis
+    container_name: ${PROJECT_NAME}-redis
+    command: ["sh", "-c", "exec redis-server --requirepass \"${REDIS_PASSWORD}\""]
 
   mysql:
     image: mysql:8.0

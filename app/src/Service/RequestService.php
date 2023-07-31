@@ -7,12 +7,15 @@ use App\Enum\RequestStatus;
 use App\Exception\TooManyRequests;
 use App\Message\SendEmailMessage;
 use App\Model\CreateRequest;
+use App\Model\ListRequest;
 use App\Model\UpdateRequest;
 use App\Model\CreateRequestResponse;
 use App\Model\RequestListItem;
 use App\Model\RequestListResponse;
 use App\Model\UpdateRequestResponse;
 use App\Repository\RequestRepository;
+use DateTimeImmutable;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
@@ -28,9 +31,24 @@ class RequestService
     {
     }
 
-    public function getRequestList(): RequestListResponse
+    private function getCriteriaFromQuery(ListRequest $query): Criteria
     {
-        $requests = $this->requestRepository->findAll();
+        $criteria = new Criteria();
+        if ($query->getStatus() !== null){
+            $criteria->andWhere(Criteria::expr()->eq('status', $query->getStatus()));
+        }
+        if ($query->getFrom() !== null){
+            $criteria->andWhere(Criteria::expr()->gte('createdAt', (new DateTimeImmutable())->setTimestamp($query->getFrom())));
+        }
+        if ($query->getTo() !== null){
+            $criteria->andWhere(Criteria::expr()->lte('createdAt', (new DateTimeImmutable())->setTimestamp($query->getTo())));
+        }
+        return $criteria;
+    }
+
+    public function getRequestList(ListRequest $query): RequestListResponse
+    {
+        $requests = $this->requestRepository->matching($this->getCriteriaFromQuery($query));
         $items = array_map(function(Request $request): RequestListItem {
             return (new RequestListItem())
                 ->setId($request->getId())
@@ -38,10 +56,10 @@ class RequestService
                 ->setEmail($request->getEmail())
                 ->setMessage($request->getMessage())
                 ->setStatus($request->getStatus()->value)
-                ->setComment($request->getComment() ?? '')
+                ->setComment($request->getComment())
                 ->setCreatedAt($request->getCreatedAt()->getTimestamp())
                 ->setUpdatedAt($request->getUpdatedAt()->getTimestamp());
-        }, $requests);
+        }, $requests->toArray());
         return (new RequestListResponse())
             ->setItems($items);
     }

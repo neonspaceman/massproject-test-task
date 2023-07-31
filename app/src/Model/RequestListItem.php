@@ -14,7 +14,7 @@ class RequestListItem
 
     private string $message;
 
-    private string $comment;
+    private ?string $comment;
 
     private int $createdAt;
 
@@ -75,12 +75,12 @@ class RequestListItem
         return $this;
     }
 
-    public function getComment(): string
+    public function getComment(): ?string
     {
         return $this->comment;
     }
 
-    public function setComment(string $comment): static
+    public function setComment(?string $comment): static
     {
         $this->comment = $comment;
         return $this;

@@ -17,10 +17,18 @@ class RequestFixtures extends Fixture
             ->setName('Test User')
             ->setEmail('test@test.com')
             ->setMessage('Need some work')
-            ->setStatus(RequestStatus::Active)
-            ->setComment('123')
-        ;
+            ->setStatus(RequestStatus::Resolved)
+            ->setComment('123');
         $manager->persist($request);
+
+        $request = new Request();
+        $request
+            ->setName('Another test user')
+            ->setEmail('another_user@test.com')
+            ->setMessage('Another request')
+            ->setStatus(RequestStatus::Active);
+        $manager->persist($request);
+
         $manager->flush();
     }
 }

@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 
-use App\Attribute\RateLimitingAnonymousApi;
+use App\Attribute\QueryString;
 use App\Attribute\RequestBody;
+use App\Enum\RequestStatus;
 use App\Model\CreateRequest;
+use App\Model\ListRequest;
 use App\Model\UpdateRequest;
 use App\Model\CreateRequestResponse;
 use App\Model\ErrorResponse;
@@ -16,6 +18,7 @@ use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -28,11 +31,14 @@ class RequestsController extends AbstractController
     }
 
     #[Route(path: '/api/v1/requests', methods: 'GET')]
+    #[OA\QueryParameter(name: 'status', description: 'Filter by request status', required: false, content: new Model(type: RequestStatus::class))]
+    #[OA\QueryParameter(name: 'from', description: 'Filter by request created at from (timestamp)', required: false, schema: new OA\Schema(type: 'integer'))]
+    #[OA\QueryParameter(name: 'to', description: 'Filter by request created at from (timestamp)', required: false, schema: new OA\Schema(type: 'integer'))]
     #[OA\Tag(name: 'Requests')]
     #[OA\Response(response: 200, description: "Get requests list", content: new Model(type: RequestListResponse::class))]
-    public function list(): Response
+    public function list(#[QueryString] ListRequest $query): Response
     {
-        return $this->json($this->requestService->getRequestList());
+        return $this->json($this->requestService->getRequestList($query));
     }
 
     #[Route(path: '/api/v1/requests/{id}', methods: 'PUT')]
@@ -56,7 +62,7 @@ class RequestsController extends AbstractController
     #[OA\Response(response: 200, description: 'Create request', content: new Model(type: CreateRequestResponse::class))]
     #[OA\Response(response: 400, description: 'Bad request', content: new Model(type: ErrorResponse::class))]
     #[OA\Response(response: 429, description: 'Too many request', content: new Model(type: ErrorResponse::class))]
-    public function create(#[RequestBody] CreateRequest $request): Response
+    public function create(#[MapRequestPayload] CreateRequest $request): Response
     {
         return $this->json($this->requestService->createRequest($request));
     }

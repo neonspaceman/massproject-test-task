@@ -1,23 +1,48 @@
-### Запуск проекта
+# Что реализовано
 
+- Система принятия и обработки заявок пользователей, через Endpoints
+- Обработка отправки email через Queued Message Handling. В докере "send-email-handler"
+- Создание новых пользователей через команду bin/console app:create-user <email> <password>
+- Тесты
+
+# Запуск проекта
+
+В папке с docker-composer.yaml выполнить
 ```php
-cp .env.test .env
 docker-compose up --build -d
-cd app
-cp .env.test .env
 ```
 
-Чтобы войти в любой из контейнеров, делаем следующее:
+Войти в контейнер
 ```php
-docker exec -it <container_name> bash
+docker exec -it mass-project-app-php-cli bash
 ```
 
-Посмотреть запущенные контейнеры:
+Установить зависимости
 ```php
-docker ps
+composer install
 ```
 
-Логи контейнера:
+Провести миграции и установить фикстуры
 ```php
-docker logs <container_name>
+bin/console doctrine:migrations:migrate -n
+bin/console --env=test doctrine:migrations:migrate -n
+bin/console doctrine:fixtures:load -n
+```
+
+После будут достпны по адресу http://localhost:8888:
+
+GET http://localhost:8888/requests/ - получение заявок ответственным лицом, с фильтрацией по статусу
+
+PUT http://localhost:8888/requests/{id}/ - ответ на конкретную задачу ответственным лицом
+
+POST http://localhost:8888/requests/ - отправка заявки пользователями системы
+
+Информацию об использовании можно получить тут:
+
+http://localhost:8888/api/doc
+
+Данные для авторизации (если были установлены фикстуры):
+```
+X-AUTH-USER: admin@test.com
+X-AUTH-PASSWORD: root
 ```

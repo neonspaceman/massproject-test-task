@@ -9,7 +9,7 @@ services:
     container_name: ${PROJECT_NAME}-nginx
     restart: always
     ports:
-      - "8081:80"
+      - "8888:80"
 
   php-fpm:
     build:
@@ -29,8 +29,6 @@ services:
       - ./app:/symfony
     command: sleep 10000
     container_name: ${PROJECT_NAME}-php-cli
-    ports:
-      - "2222:22"
       
   send-email-handler:
     build:

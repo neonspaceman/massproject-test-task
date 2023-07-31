@@ -8,14 +8,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class CreateRequest
 {
     #[NotBlank]
-    private string $name;
+    private string $name = '';
 
     #[NotBlank]
     #[Email]
-    private string $email;
+    private string $email = '';
 
     #[NotBlank]
-    private string $message;
+    private string $message = '';
 
     public function getName(): string
     {

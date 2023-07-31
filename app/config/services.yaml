@@ -6,6 +6,7 @@
 parameters:
     exceptions:
         Symfony\Component\HttpKernel\Exception\NotFoundHttpException: { code: 404 }
+        App\Exception\RequestBodyConvertException.php: { code: 400 }
         App\Exception\RequestNotFoundException: { code: 404, hidden: false }
         App\Exception\TooManyRequests: { code: 429, hidden: false }
         App\Exception\AuthenticationException: { code: 401, hidden: false }
@@ -31,10 +32,10 @@ services:
         arguments:
             $mappings: '%exceptions%'
 
-#    App\Listener\ApiExceptionListener:
-#        tags:
-#            - { name: kernel.event_listener, event: kernel.exception, priority: 10 }
-#
-#    App\Listener\ValidationExceptionListener:
-#        tags:
-#            - { name: kernel.event_listener, event: kernel.exception, priority: 20 }
+    App\Listener\ApiExceptionListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, priority: 10 }
+
+    App\Listener\ValidationExceptionListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, priority: 20 }

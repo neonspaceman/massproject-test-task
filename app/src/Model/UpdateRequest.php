@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class UpdateRequest
 {
     #[NotBlank]
-    private string $comment;
+    private string $comment = '';
 
     public function getComment(): string
     {

@@ -29,7 +29,7 @@ class Request
     private string $message;
 
     #[ORM\Column(type: "text", nullable: true)]
-    private ?string $comment;
+    private ?string $comment = null;
 
     #[ORM\Column(type: "datetime_immutable")]
     private DateTimeImmutable $createdAt;

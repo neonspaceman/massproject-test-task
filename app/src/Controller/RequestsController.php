@@ -62,7 +62,7 @@ class RequestsController extends AbstractController
     #[OA\Response(response: 200, description: 'Create request', content: new Model(type: CreateRequestResponse::class))]
     #[OA\Response(response: 400, description: 'Bad request', content: new Model(type: ErrorResponse::class))]
     #[OA\Response(response: 429, description: 'Too many request', content: new Model(type: ErrorResponse::class))]
-    public function create(#[MapRequestPayload] CreateRequest $request): Response
+    public function create(#[RequestBody] CreateRequest $request): Response
     {
         return $this->json($this->requestService->createRequest($request));
     }

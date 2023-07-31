@@ -9,7 +9,7 @@
 
 В папке с docker-composer.yaml выполнить
 ```php
-docker-compose up --build -d
+docker compose up --build -d
 ```
 
 Войти в контейнер
@@ -24,9 +24,15 @@ composer install
 
 Провести миграции и установить фикстуры
 ```php
-bin/console doctrine:migrations:migrate -n
-bin/console --env=test doctrine:migrations:migrate -n
-bin/console doctrine:fixtures:load -n
+php bin/console doctrine:migrations:migrate -n
+php bin/console --env=test doctrine:migrations:migrate -n
+php bin/console doctrine:fixtures:load -n
+```
+
+Перезапустить контейнеры
+```php
+docker compose down
+docker compose up --build -d
 ```
 
 После будут достпны по адресу http://localhost:8888:

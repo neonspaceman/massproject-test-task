@@ -14,4 +14,4 @@ RUN pecl install redis && docker-php-ext-enable redis
 
 WORKDIR /symfony
 
-CMD bin/console messenger:consume send-email-handler -vv
+CMD php bin/console messenger:consume send-email-handler -vv
